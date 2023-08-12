@@ -29,3 +29,39 @@ FROM assistance_requests
 JOIN students ON students.id = student_id
 WHERE name = 'Elliot Dickinson'
 GROUP BY students.name;
+
+
+-- Get the average time of an assistance request.
+
+-- Select just a single row here and name it average_assistance_request_duration
+-- In Postgres, we can subtract two timestamps to find the duration between them. (timestamp1 - timestamp2)
+-- Expected Result:
+
+--  average_assistance_request_duration 
+-- -------------------------------------
+--  00:14:21.556903
+-- (1 row)
+SELECT avg(completed_at - started_at) as average_assistance_request_duration
+FROM assistance_requests;
+
+-- Get the average duration of assistance requests for each cohort.
+
+-- Select the cohort's name and the average assistance request time.
+-- Order the results from shortest average to longest.
+-- Expected Result:
+
+--  name  | average_assistance_time 
+-- -------+-------------------------
+--  SEP24 | 00:13:23.071576
+--  JUL30 | 00:13:23.956547
+--  FEB12 | 00:13:42.66022
+--  JUN04 | 00:13:45.974562
+--  MAY07 | 00:13:58.745754
+-- ...
+-- (11 rows)
+SELECT cohorts.name, avg(completed_at - started_at) as average_assistance_time
+FROM assistance_requests 
+JOIN students ON students.id = assistance_requests.student_id
+JOIN cohorts ON cohorts.id = cohort_id
+GROUP BY cohorts.name
+ORDER BY average_assistance_time;
